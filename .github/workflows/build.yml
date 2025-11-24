@@ -1,0 +1,50 @@
+name: SonarQube
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: 'maven'
+
+      - name: Cache Sonar
+        uses: actions/cache@v4
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
+      - name: Cache Maven packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+
+      - name: Build and analyze with SonarCloud
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          BRANCH_NAME: ${{ github.ref_name }}
+        run: |
+          mvn -B -Dmaven.compiler.release=8 -DskipTests verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+            -Dsonar.login=$SONAR_TOKEN \
+            -Dsonar.projectKey=sakuapp_journalapp \
+            -Dsonar.organization=sakuapp \
+            -Dsonar.host.url=https://sonarcloud.io \
+            -Dsonar.branch.name=$BRANCH_NAME
