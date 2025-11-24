@@ -43,7 +43,7 @@ jobs:
           BRANCH_NAME: ${{ github.ref_name }}
         run: |
           mvn -B -Dmaven.compiler.release=8 -DskipTests verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
-            -Dsonar.login=$SONAR_TOKEN \
+            -Dsonar.token=$SONAR_TOKEN \
             -Dsonar.projectKey=sakuapp_journalapp \
             -Dsonar.organization=sakuapp \
             -Dsonar.host.url=https://sonarcloud.io \
