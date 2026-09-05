@@ -17,7 +17,7 @@ public class UserServiceTests {
     @Autowired
     private UserRepository userRepository;
 
-    @Disabled
+    //@Disabled
     @Test
     public void testhai(){
         assertEquals(4,2+2);

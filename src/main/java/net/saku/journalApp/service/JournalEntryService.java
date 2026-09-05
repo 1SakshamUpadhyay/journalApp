@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,8 +29,12 @@ public class JournalEntryService {
     public void saveEntry(JournalEntry journalEntry, String userName){
         try{
             User user=userService.findByUsername(userName);
+            if(user==null)
+                throw new RuntimeException("User not found: "+userName);
             journalEntry.setDate(LocalDateTime.now());
             JournalEntry saved=journalEntryRepository.save(journalEntry);
+            if(user.getJournalEntries()==null)
+                user.setJournalEntries(new ArrayList<>());
             user.getJournalEntries().add(saved);
             userService.saveUser(user);
         }
