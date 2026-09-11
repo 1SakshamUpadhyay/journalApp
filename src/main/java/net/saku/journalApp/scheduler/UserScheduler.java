@@ -4,9 +4,11 @@ import net.saku.journalApp.cache.AppCache;
 import net.saku.journalApp.entity.JournalEntry;
 import net.saku.journalApp.entity.User;
 import net.saku.journalApp.enums.Sentiment;
+import net.saku.journalApp.model.SentimentData;
 import net.saku.journalApp.repository.UserRepositoryImpl;
 import net.saku.journalApp.service.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -29,11 +31,16 @@ public class UserScheduler {
     @Autowired
     private AppCache appCache;
 
+    @Autowired
+    private KafkaTemplate<String, SentimentData> kafkaTemplate;
+
 //    @Scheduled(cron = "0 0 9 * * SUN")
     public void fetchUserAndSendMail() {
         List<User> users = userRepository.getUserForSA();
         for (User user : users) {
             List<JournalEntry> journalEntries = user.getJournalEntries();
+            System.out.println("User: " + user.getUsername());
+            System.out.println("Email: " + user.getEmail());
             List<Sentiment> sentiments = journalEntries.stream().filter(x -> x.getDate().isAfter(LocalDateTime.now().minus(7, ChronoUnit.DAYS))).map(x -> x.getSentiment()).collect(Collectors.toList());
 
             // Calculate the most frequent sentiment
@@ -49,8 +56,10 @@ public class UserScheduler {
                     mostFreqSent = entry.getKey();
                 }
             if (mostFreqSent != null) {
-                emailService.sendEmail(user.getEmail(), "Sentiment for last 7 days ", mostFreqSent.toString());
+                SentimentData sentimentData=SentimentData.builder().email(user.getEmail()).sentiment("Sentiment for last 7 days "+mostFreqSent).build();
+                kafkaTemplate.send("weekly-sentiments",sentimentData.getEmail(),sentimentData);
             }
+            System.out.println("Most frequent sentiment: " + mostFreqSent);
         }
     }
 
