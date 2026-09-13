@@ -1,27 +1,38 @@
 package net.saku.journalApp.service;
 
+import com.resend.Resend;
+import com.resend.services.emails.model.CreateEmailOptions;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
 public class EmailService {
 
-    @Autowired
-    public JavaMailSender javaMailSender;
+    @Value("${resend.api.key}")
+    private String resendApiKey;
 
-    public void sendEmail(String to,String subject,String body){
-        try{
-            SimpleMailMessage mail=new SimpleMailMessage();
-            mail.setTo(to);
-            mail.setSubject(subject);
-            mail.setText(body);
-            javaMailSender.send(mail);
-        } catch (RuntimeException e) {
-            log.error("Exception while sendEmail ",e);
+    @Value("${resend.from.email}")
+    private String fromEmail;
+
+    public void sendEmail(String to, String subject, String body) {
+        try {
+            Resend resend = new Resend(resendApiKey);
+
+            CreateEmailOptions params = CreateEmailOptions.builder()
+                    .from(fromEmail)
+                    .to(to)
+                    .subject(subject)
+                    .text(body)
+                    .build();
+
+            resend.emails().send(params);
+
+            log.info("Email sent successfully to {}", to);
+
+        } catch (Exception e) {
+            log.error("Exception while sending email", e);
         }
     }
 }
