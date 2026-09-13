@@ -1,0 +1,63 @@
+spring:
+  data:
+    mongodb:
+      uri: ${MONGODB_URI}
+      database: journaldb
+      auto-index-creation: true
+
+  redis:
+    url: ${REDIS_URL}
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
+
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+    consumer:
+      group-id: weekly-sentiment-group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring:
+          json:
+            trusted:
+              packages: net.saku.journalApp.model
+
+    properties:
+      security:
+        protocol: SASL_SSL
+
+      sasl:
+        mechanism: PLAIN
+        jaas:
+          config: ${KAFKA_SASL_JAAS_CONFIG}
+
+      session:
+        timeout:
+          ms: 45000
+
+server:
+  port: ${PORT:8080}
+  servlet:
+    context-path: /journal
+
+weather:
+  api:
+    key: ${WEATHER_API_KEY}
+
+jwt:
+  secret: ${JWT_SECRET}
