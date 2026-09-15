@@ -19,7 +19,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
-@Profile("dev")
+//@Profile("dev")
 @SuppressWarnings("deprecation")
 public class SpringSecurity extends WebSecurityConfigurerAdapter {
 
