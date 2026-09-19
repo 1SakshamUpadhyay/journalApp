@@ -1,5 +1,6 @@
 package net.saku.journalApp.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import net.saku.journalApp.cache.AppCache;
 import net.saku.journalApp.entity.User;
 import net.saku.journalApp.service.UserService;
@@ -12,6 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/admin")
+@Tag(name="Admin APIs")
 public class AdminController {
 
     @Autowired
