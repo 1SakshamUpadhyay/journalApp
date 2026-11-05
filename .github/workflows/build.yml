@@ -1,16 +1,32 @@
+
 name: JournalApp CI
 
 on:
   push:
     branches: [ main ]
+
   pull_request:
     types: [opened, synchronize, reopened]
+
   workflow_dispatch:
 
 jobs:
+
+  # BACKEND BUILD AND TESTS
   backend:
     name: Backend Build and Tests
     runs-on: ubuntu-latest
+
+    services:
+      mongodb:
+        image: mongo:7.0
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --quiet --eval 'db.adminCommand(\"ping\")'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
 
     defaults:
       run:
@@ -28,10 +44,13 @@ jobs:
           cache: maven
 
       - name: Run backend tests and build
+        env:
+          SPRING_DATA_MONGODB_URI: mongodb://localhost:27017/journaldb
         run: |
           chmod +x mvnw
           ./mvnw -B clean verify
 
+  # FRONTEND BUILD
   frontend:
     name: Frontend Build
     runs-on: ubuntu-latest
