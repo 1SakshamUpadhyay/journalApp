@@ -1,18 +1,12 @@
-
 name: JournalApp CI
 
 on:
   push:
-    branches: [ main ]
-
+    branches: [ "main" ]
   pull_request:
-    types: [opened, synchronize, reopened]
-
-  workflow_dispatch:
+    branches: [ "main" ]
 
 jobs:
-
-  # BACKEND BUILD AND TESTS
   backend:
     name: Backend Build and Tests
     runs-on: ubuntu-latest
@@ -42,16 +36,23 @@ jobs:
           distribution: temurin
           java-version: '17'
           cache: maven
+          cache-dependency-path: journalApp/pom.xml
 
-      - name: Run backend tests and build
+      - name: Give Maven wrapper permission
+        run: chmod +x mvnw
+
+      - name: Build and test backend
+        run: ./mvnw -B clean verify
         env:
           SPRING_DATA_MONGODB_URI: mongodb://localhost:27017/journaldb
-          JWT_SECRET: "MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY="
-        run: |
-          chmod +x mvnw
-          ./mvnw -B clean verify
 
-  # FRONTEND BUILD
+          # Test-only JWT key. Not a production secret.
+          JWT_SECRET: "MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY="
+
+          # Dummy OAuth values for CI application startup only.
+          SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID: test-google-client-id
+          SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET: test-google-client-secret
+
   frontend:
     name: Frontend Build
     runs-on: ubuntu-latest
@@ -74,5 +75,5 @@ jobs:
       - name: Install frontend dependencies
         run: npm ci
 
-      - name: Build React frontend
+      - name: Build frontend
         run: npm run build
