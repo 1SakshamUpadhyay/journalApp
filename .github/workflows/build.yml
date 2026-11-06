@@ -46,6 +46,7 @@ jobs:
       - name: Run backend tests and build
         env:
           SPRING_DATA_MONGODB_URI: mongodb://localhost:27017/journaldb
+          JWT_SECRET: "MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY="
         run: |
           chmod +x mvnw
           ./mvnw -B clean verify
