@@ -76,3 +76,8 @@ resend:
     key: ${RESEND_API_KEY}
   from:
     email: ${RESEND_FROM_EMAIL}
+
+  app:
+    frontend-url: ${FRONTEND_URL}
+    oauth:
+      redirect-uri: ${OAUTH_REDIRECT_URI}
