@@ -1,0 +1,50 @@
+
+spring:
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/journalapp_test
+      database: journalapp_test
+      auto-index-creation: true
+
+  redis:
+    url: redis://localhost:6379
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    listener:
+      auto-startup: false
+    properties:
+      security:
+        protocol: PLAINTEXT
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: test-google-client-id
+            client-secret: test-google-client-secret
+
+  mail:
+    host: localhost
+    port: 1025
+    username: test
+    password: test
+
+app:
+  redis:
+    enabled: false
+
+weather:
+  api:
+    key: test-weather-api-key
+
+jwt:
+  secret: "MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY="
+  expiration-ms: 3600000
+
+resend:
+  api:
+    key: re_test_dummy
+  from:
+    email: test@example.com

@@ -1,10 +1,11 @@
+
 name: JournalApp CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   backend:
@@ -34,7 +35,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '17'
+          java-version: "17"
           cache: maven
           cache-dependency-path: journalApp/pom.xml
 
@@ -44,14 +45,25 @@ jobs:
       - name: Build and test backend
         run: ./mvnw -B clean verify
         env:
-          SPRING_DATA_MONGODB_URI: mongodb://localhost:27017/journaldb
+          SPRING_PROFILES_ACTIVE: test
 
-          # Test-only JWT key. Not a production secret.
+          MONGODB_URI: mongodb://localhost:27017/journalapp_test
+          REDIS_URL: redis://localhost:6379
+
           JWT_SECRET: "MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY="
+          WEATHER_API_KEY: test-weather-api-key
 
-          # Dummy OAuth values for CI application startup only.
-          SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID: test-google-client-id
-          SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET: test-google-client-secret
+          GOOGLE_CLIENT_ID: test-google-client-id
+          GOOGLE_CLIENT_SECRET: test-google-client-secret
+
+          MAIL_USERNAME: test@example.com
+          MAIL_PASSWORD: test-password
+
+          KAFKA_BOOTSTRAP_SERVERS: localhost:9092
+          KAFKA_SASL_JAAS_CONFIG: 'org.apache.kafka.common.security.plain.PlainLoginModule required username="test" password="test";'
+
+          RESEND_API_KEY: re_test_dummy
+          RESEND_FROM_EMAIL: test@example.com
 
   frontend:
     name: Frontend Build
@@ -68,7 +80,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: "22"
           cache: npm
           cache-dependency-path: frontend/package-lock.json
 

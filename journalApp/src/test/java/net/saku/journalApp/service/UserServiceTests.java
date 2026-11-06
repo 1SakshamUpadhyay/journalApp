@@ -1,14 +1,12 @@
+
 package net.saku.journalApp.service;
 
 import net.saku.journalApp.entity.User;
 import net.saku.journalApp.repository.UserRepository;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -17,38 +15,25 @@ public class UserServiceTests {
     @Autowired
     private UserRepository userRepository;
 
-    //@Disabled
     @Test
-    public void testhai(){
-        assertEquals(4,2+2);
-        User user=userRepository.findByUsername("ram");
-        assertTrue(!user.getJournalEntries().isEmpty());
-        assertTrue(5>3);
-    }
+    public void testFindByUsername() {
+        User user = new User();
+        user.setUsername("testuser");
+        user.setEmail("testuser@example.com");
+        user.setPassword("testpassword");
 
-    @ParameterizedTest
-    @ValueSource(strings ={
-            "ram",
-            "saksham",
-            "anjali"
-    })
-    public void testfindByUsername(String name){
-        assertNotNull(userRepository.findByUsername(name),"failed for:"+name);
-    }
+        userRepository.save(user);
 
-    @ParameterizedTest
-    @CsvSource({
-            "1,1,2",
-            "2,10,12",
-            "3,3,6"
-    })
-    public void test(int a,int b,int expected){
-        assertEquals(expected,a+b);
+        User foundUser = userRepository.findByUsername("testuser");
+
+        assertNotNull(foundUser);
+        assertEquals("testuser", foundUser.getUsername());
+
+        userRepository.delete(user);
     }
 
     @Test
-    public void printMongoConnection() {
-        System.out.println("Mongo URI: " +
-                System.getProperty("spring.data.mongodb.uri"));
+    public void testAddition() {
+        assertEquals(4, 2 + 2);
     }
 }
