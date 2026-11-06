@@ -77,7 +77,7 @@ resend:
   from:
     email: ${RESEND_FROM_EMAIL}
 
-  app:
-    frontend-url: ${FRONTEND_URL}
-    oauth:
-      redirect-uri: ${OAUTH_REDIRECT_URI}
+app:
+  frontend-url: ${FRONTEND_URL}
+  oauth:
+    redirect-uri: ${OAUTH_REDIRECT_URI}
