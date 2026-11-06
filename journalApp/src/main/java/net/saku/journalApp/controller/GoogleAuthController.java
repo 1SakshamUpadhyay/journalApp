@@ -29,11 +29,11 @@ import java.util.*;
 @Slf4j
 public class GoogleAuthController {
 
-    private static final String REDIRECT_URI =
-            "http://localhost:8080/journal/auth/google/callback";
+    @Value("${app.oauth.redirect-uri:http://localhost:8080/journal/auth/google/callback}")
+    private String redirectUri;
 
-    private static final String FRONTEND_CALLBACK =
-            "http://localhost:5173/oauth/callback";
+    @Value("${app.frontend-url:http://localhost:5173}")
+    private String frontendUrl;
 
     @Value("${spring.security.oauth2.client.registration.google.client-id}")
     private String clientId;
@@ -75,7 +75,7 @@ public class GoogleAuthController {
                 .fromUriString(
                         "https://accounts.google.com/o/oauth2/v2/auth")
                 .queryParam("client_id", clientId)
-                .queryParam("redirect_uri", REDIRECT_URI)
+                .queryParam("redirect_uri", redirectUri)
                 .queryParam("response_type", "code")
                 .queryParam("scope", "openid email profile")
                 .queryParam("state", state)
@@ -117,7 +117,7 @@ public class GoogleAuthController {
             params.add("code", code);
             params.add("client_id", clientId);
             params.add("client_secret", clientSecret);
-            params.add("redirect_uri", REDIRECT_URI);
+            params.add("redirect_uri", redirectUri);
             params.add("grant_type", "authorization_code");
 
             HttpHeaders headers = new HttpHeaders();
@@ -215,7 +215,7 @@ public class GoogleAuthController {
             ticketRepository.save(ticket);
 
             URI frontendUri = UriComponentsBuilder
-                    .fromUriString(FRONTEND_CALLBACK)
+                    .fromUriString(frontendUrl + "/oauth/callback")
                     .queryParam("ticket", loginTicket)
                     .build()
                     .encode()
@@ -286,8 +286,12 @@ public class GoogleAuthController {
 
     private ResponseEntity<Void> frontendError() {
 
-        URI errorUri = URI.create(
-                FRONTEND_CALLBACK + "?error=google_login_failed");
+        URI errorUri = UriComponentsBuilder
+                .fromUriString(frontendUrl + "/oauth/callback")
+                .queryParam("error", "google_login_failed")
+                .build()
+                .encode()
+                .toUri();
 
         return ResponseEntity.status(HttpStatus.FOUND)
                 .location(errorUri)
